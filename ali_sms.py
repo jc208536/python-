@@ -1,6 +1,6 @@
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
-client = AcsClient('LTAI4FzXq4ZMvHqsG89UX51W', 'gVL3IaGTqrkqJmffYbgtHbQvzG602w', 'cn-hangzhou')
+client = AcsClient('', '', 'cn-hangzhou')
 
 def send_sms(phonenumber,code):
     request = CommonRequest()
@@ -14,7 +14,7 @@ def send_sms(phonenumber,code):
     request.add_query_param('RegionId', "cn-hangzhou")
     request.add_query_param('PhoneNumbers', phonenumber)
     request.add_query_param('SignName', "")
-    request.add_query_param('TemplateCode', "SMS_206470102")
+    request.add_query_param('TemplateCode', "SMS_")
     request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % code)
 
     response = client.do_action(request)
