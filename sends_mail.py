@@ -7,7 +7,7 @@ def send_mail_domo(sender,to,subject,context):
 	# 连接邮件服务器
 	conn = smtplib.SMTP_SSL('smtp.qq.com', 465)
 	# 登录
-	conn.login('1484387355@qq.com', 'nzbqmnamkfmtiagi')  # 用户名 和授权码
+	conn.login('123456@qq.com', '授权码')  # 用户名 和授权码
 	# 生成邮件发送对象
 	email_obj = MIMEMultipart()
 	# 邮件主题
@@ -19,5 +19,5 @@ def send_mail_domo(sender,to,subject,context):
 	# 发送邮件
 	conn.sendmail(sender, to, email_obj.as_string())
 
-# send_mail('1484387355@qq.com','jc_wyml@163.com','悠悠我心','青青子衿，悠悠我心，但为君故，沉吟至今')
+# send_mail('@qq.com','@163.com','悠悠我心','青青子衿，悠悠我心，但为君故，沉吟至今')
 
