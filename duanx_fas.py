@@ -9,4 +9,4 @@ def get_code(number):
         source.append(str(x)) # 把0-9混进去
     return "".join(random.sample(source,number))
 
-send_sms(13297604721,get_code(5))
+send_sms(phone,get_code(5))
