@@ -1,0 +1,359 @@
+# week_2 notes
+
+## 1 pygame
+
+>基本框架：
+
+```python
+# 导入pygame库
+import pygame 
+# 初始化
+pygame.init()
+# 创建一个游戏窗口
+pygame.display.set_mod((600,600))
+# 设置游戏标题
+pygame.display.set_caption('游戏标题')
+# 让游戏保持运行的状态
+while True:
+    # 检测事件
+    for x in pygame.envet.get():
+        # 检测鼠标点击关闭事件  如果点击那么退出游戏
+        if x.type==pygame.QUIT:
+            exit()
+```
+
+>简单动画应用(图形展示)
+
+```python
+import pygame 
+from math import pi
+pygame.init()
+window = pygame.display.set_mod((600,600))
+pygame.display.set_caption('显示窗口标题')
+# 给窗口设置背景颜色
+window.fill((255,255,255))
+---------------------图形显示----------------------
+# 1.画直线 line(画在哪，线的颜色，线的起点，线的终点，线宽=)
+pygame.draw.line(window,(0,255,0),(10,20),(200,30),width=3)
+# 2.画折现 line(画在哪，线的颜色，是否闭合，多个点，线宽=)
+points = [(20,255),(100,150),(180,260),(300,100)]
+pygame.draw.line(window,(255,0,0),Ture,points,3)
+# 3.画圆 circle(画在哪，线的颜色，坐标，半径，线宽=)
+pygame.draw.circle(window,(0,0,255),(200,300),50,4)
+# 4.矩形 rect(画在哪，线的颜色，矩形范围，线宽=)
+pygame.draw.rect(window,(110,32,42),(30,21,66,123),3)
+# 5.椭圆 ellipse(画在哪，线的颜色，椭圆范围，线宽=)
+pygame.draw.ellipse(window,(28,58,98),(50,60,70,210),2)
+----------------------------------------------------
+pygame.display.flip()
+while Ture:
+    for x in pygame.event.get():
+        if x.type ==pygame.QUIT:
+            exit()
+```
+
+>小球跳动动画实现
+
+``` python
+import pygame
+pygame.init()
+win_width= 800
+win_height = 700
+window = pygame.display.set_mod((win_width,win_height))
+pygame.display.set_caption('小球跳动')
+image1 = pygame.image.load('背景图片路径')
+# 渲染背景
+window.blit(image1,(0,0))
+# 画圆
+pygame.draw.circle(window,(0,0,255),(300,100),50,5)
+# 第一次刷新 
+pygame.display.flip()
+z =2
+y = 50
+num = 0
+while True:
+    num += 1
+    if num % 10 ==0:
+        y = y+z
+        if y <= 50:				# 设置窗口上部反弹边界
+            z = z * -1			# 达到边界z为负数 小球向下移动
+            y = y +z			
+        if y > win_height-50:
+            z = z*-1
+            y = y +z
+    pygame.draw.circle(window,(0,0,255),(300,y),50)		# 画圆
+    pygame.display.update()				# 再次刷新
+    window.blit(image1,(0,0))
+    for i in pygame.enent.get():
+        if i.type == pygame.QUIT:
+            exit()
+```
+
+
+
+## 2 Mail_send
+
+>使用smtp服务器发送邮件
+
+封装邮件发送函数
+
+```python
+# 安装smtplibaio库  导入smtplib
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
+from email.mime.text import MIMEText
+
+def send_mail_domo(sender,to,subject,context):
+    # 连接邮件服务器
+    conn = smtplib.SMTP_SSL('smtp.qq.com',465)
+    # 登录
+    conn.login('1484387355@qq.com','授权码')    # 用户名 和授权码
+    # 邮件主题
+    email_obj['subject']=Header(subject,'utf-8').encode()
+    # 内容
+    context = MIMEText(context,_charset='utf-8')
+    email_obj.attach(context)
+    # 发送邮件
+    conn.sendmail(sender,to,email_obj.as_string())
+```
+
+> 发送邮件
+
+```python
+from 封装函数地址 import 发送邮件函数
+send_mail_domo('发送邮箱地址'，'接收邮箱地址'，'内容')
+```
+
+
+
+## 3 AliYun_dx
+
+>在阿里云短信服务中申请签名和模板
+>
+>查看自己的AccessKey和Secret
+>
+>在**短信服务**的**快速学习**中点击**查看API domo**找到python代码即可复制
+
+``` python
+from aliyunsdkcore.client import AcsClient
+from aliyunsdkcore.request import CommonRequest
+client = AcsClient('AccessKey', 'Secret', 'cn-hangzhou')
+
+def send_sms(phonenumber,code):
+    request = CommonRequest()
+    request.set_accept_format('json')
+    request.set_domain('dysmsapi.aliyuncs.com')
+    request.set_method('POST')
+    request.set_protocol_type('https')  # https | http
+    request.set_version('2017-05-25')
+    request.set_action_name('SendSms')
+
+    request.add_query_param('RegionId', "cn-hangzhou")
+    request.add_query_param('PhoneNumbers', phonenumber)
+    request.add_query_param('SignName', "签名")
+    request.add_query_param('TemplateCode', "SMS模板")
+    request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % code)
+
+    response = client.do_action(request)
+    # python2:  print(response)
+    print(str(response, encoding='utf-8'))
+
+
+```
+
+发送短信：
+
+```python
+from DuanXin.ali_sms import send_sms
+import string
+import random
+#这个方法专门用来生成字母加数字
+
+def get_code(number):
+    source = list(string.ascii_letters) #成一个 大写字母小写字母的列表
+    for x in range(0,10):
+        source.append(str(x)) # 把0-9混进去
+    return "".join(random.sample(source,number))
+
+send_sms(phone_num,get_code(5))
+
+```
+
+
+
+## 4 pyecharts
+
+> 柱状图
+
+``` python
+from pyecharts.charts import Bar
+from pyecharts import options
+# 给定数据
+province =['湖北','北京','新疆','山东','安徽','云南','上海','广东']
+date1 = [10000,5000,5000,3000,6000,4321,6523,3424]
+date2 = [1200,50,43,32,75,43,41,9]
+# 创建图表对象
+bar = Bar()
+# 渲染数据到表上
+bar.add_xaxis(province)
+bar.add_yaxis('人数',date1)
+bar.add.yaxis('人数',date2)
+# 设置图表
+bar.set_global_opts(
+	# 标题和副标题
+    title_opts = options.TitleOpts(title = "重点城市疫情",subtitle='人数'),
+    toolbox_opts=options.ToolboxOppts(),		# 显示工具栏
+)
+# 系统设置
+bar.set_series_opts(
+	# 是否显示数值
+    label_opts = option.LabelOpts(is_show=False),
+    # 添加标记点
+    markpoint_opts = opyions.MarkPointOpts(
+    	data=[
+            options.MarkPointItem(type_='min',name='最小值'),
+            options.MarkPointItem(type_='max',name='最大值'),
+        ]
+    )
+)
+bar.render('Tu_image/柱状图.html')
+```
+
+> 饼图
+
+```python
+from pyecharts.charts import Pie
+from pyecharts import options
+# 设置显示数据
+date =[('锤子',200),('Oppo',123),('华为',300),('Vivo',213),('一加',111)]
+# 创建图表对象
+pie = Pie()
+# 将数据渲染到图表上
+pie.add(
+	# 数据显示
+    data_pair= date,
+    # 名称显示
+    series_name = '国产手机销量'，
+    # 数据显示部分的比例
+    radius=['30%','70%'],
+    rosetype='noradius',
+)
+# 额外系统设置
+pie.set_global_opts(
+	title_opts = options.TitleOpts(tital='国产手机销量')
+)
+pie.set_series_opts(
+	label_opts=options.LabelOpts(formatter='{b}:{d}')
+)
+# 显示图表
+pie.render('保存路径')
+```
+
+>地图
+
+```python
+from pyecharts.charts import Map
+from pyecharts import options
+# 数据准备
+data = [('湖北',68149),('内蒙古',333),('四川',808),('上海',1350),('陕西',501),('山东',84)]
+
+# 生成图表对象
+map = Map()
+# 渲染数据
+map.add(series_name='国内主要城市感染人数',data_pair=data,maptype='china')
+map.set_gloabal_opts(
+	title_opts=options.TitleOpts(title='感染人数'),
+    legend_opts=options.LegendOpts(is_show=True),
+    visualmap_opts=options.VisualMapOpts(
+    	max_ = 70000,
+        min_=0,
+        is_piecewise=True,				# 按照自己规定的区间 颜色展示
+        pieces=[	
+            {"min":0,"max":100, "label":'0-100', 'color': 'pink'},
+            {"min":100,"max":200 "label":'100-200', 'color': 'yellow'},
+            {"min":200,"max":1000 "label":'200-1000','color':'blue'},
+            {"min": 1000, "max": 2000, "label": '1000-2000', 'color': 'orange'},
+            {"min": 2000, "label": '>=2000', 'color': 'red'},
+            
+        ]
+    ),
+)
+# 生成图表
+map.render('图片路径')
+```
+
+>组合图
+
+```python
+from pyecharts.charts import Bar,Line,Grid,Pie
+from pyecharts import options
+
+province = ['湖北','北京','新疆','山东','安徽','云南','上海']
+data1 = [10000,5000,5500,5100,6000,4213,50012]
+data2 = [1200,500,600,200,300,400,1000]
+data3= [('湖北',10000),('北京',5000),('新疆',5500)]
+
+line = Line()#实例化折线图对象
+pie = Pie()
+
+line.add_xaxis(province)
+line.add_yaxis('确诊人数',data1)
+line.add_yaxis('已故人数',data2)
+grid = Grid(init_opts=options.InitOpts(width='1220px',height='800px'))
+
+pie.add(
+    data_pair = data3,
+    series_name='确诊人数',
+    radius = [0,100],
+    # rosetype='radius',
+)
+
+#
+grid.add(line,grid_opts=options.GridOpts(
+    pos_top='100',
+    pos_right='100',
+    width='800',
+    height='800',
+
+))
+
+grid.add(pie,grid_opts=options.GridOpts(
+    pos_top='1300',
+    pos_left='650',
+    width='550',
+    height='450'
+))
+
+
+#渲染到页面
+
+grid.render('Tu_image/组合图_1.html')
+```
+
+## Excel操作
+
+编辑Excel 编辑的实质是读取 编辑 写入新的Excel文件
+
+```python
+import xlrd
+import xlwt
+# 打开需要操作的文件
+rwd = xlrd.open_wordbook('file_load')
+# 拿出需要操作的表
+mysheet= rwb.sheet_by_index(0)
+# 添加单元格
+mysheet.put_cell(0,4,xlrd.XL_CELL_TEXT,'总分',None)
+for col in range (1,mysheet.ncols):
+    avg =sum(mysheet.col_slice(col,1,mysheet.nrows))/mysheet.nrow
+    mysheet.put_cell(col,19,xlrd.XL_CELL_NUMBER,avg,None)
+wwb =xlwt.Workbook(encoding='utf-8')
+# 编辑第一个表表名
+new_sheet =wwb.add_sheet('一班')
+# 遍历 获取表的数据  写入new_score表中
+for row in range(mysheet.nrows):
+    for col in range(mysheet.ncols):
+        value = mysheet,cell_value(row,col)
+        new_sheet.write(row,col,value)
+wwb.save('file_load')
+```
