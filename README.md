@@ -1,2 +1,1 @@
-# python-
-在学习python过程中的程序代码
+# python实现短信发送服务
